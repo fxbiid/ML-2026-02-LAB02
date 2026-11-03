@@ -56,7 +56,7 @@ Salida esperada al cargar Olivetti: `X (400, 4096)`, train `(300, 4096)`, test `
 | `src/clasificadores/` | Listo | SVM lineal, k-NN (k=3) y árbol (`max_depth=8`) |
 | `src/evaluacion/` | Listo | Accuracy, macro-F1, confusión, curva PCA, t-SNE y UMAP |
 | `src/interfaz/` y `app.py` | Listo | Foto de prueba, acierto y probabilidad |
-| `src/embeddings/fisherfaces.py` | `TODO(alumno)` | PCA y después LDA, ambos ajustados en TRAIN |
+| `src/embeddings/fisherfaces.py` | Listo | PCA y después LDA, ambos ajustados en TRAIN |
 | `src/datos/lfw.py` | `TODO(alumno)` | Hasta 50 identidades con al menos 20 fotos |
 
 Si ejecuta una etapa pendiente, el programa imprime una pista y **no falla en silencio**. Cuando Fisherfaces deje de lanzar `EtapaPendienteAlumno`, el mismo bucle lo evalúa con SVM, k-NN y árbol. Cuando `CargadorLFW.cargar` devuelva un `ConjuntoRostros`, `python main.py lfw` reutiliza ese protocolo.
