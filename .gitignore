@@ -3,6 +3,7 @@
 .conda/
 .venv/
 venv/
+.idea/
 
 # Entorno cursor
 # Cursor (local)

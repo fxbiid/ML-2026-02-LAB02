@@ -1,17 +1,16 @@
-"""Fisherfaces: PCA comprime y LDA discrimina. Lo implementa el alumno."""
+"""Fisherfaces: PCA comprime y LDA discrimina, aprendiendo solo de TRAIN."""
 
 from __future__ import annotations
 
 import numpy as np
 
 from src.embeddings.base import ExtractorEmbedding
-from src.excepciones import EtapaPendienteAlumno
+from src.embeddings.lda import ExtractorLDA
+from src.embeddings.pca import ExtractorPCA
 
 
 class ExtractorFisherfaces(ExtractorEmbedding):
     """Proyección z = W_LDAᵀ W_PCAᵀ (x − μ), ajustada solo con TRAIN.
-
-    TODO(alumno): implementar ``fit`` y ``transform``.
 
     Orden obligatorio:
 
@@ -35,24 +34,55 @@ class ExtractorFisherfaces(ExtractorEmbedding):
             )
         self.d_pca = int(d_pca)
         self.d_lda = int(d_lda)
+        self._pca = ExtractorPCA(n_components=self.d_pca)
+        self._lda = ExtractorLDA(n_components=self.d_lda)
 
     @property
     def dimension(self) -> int:
         return self.d_lda
 
     def fit(self, X: np.ndarray, y: np.ndarray | None = None) -> ExtractorFisherfaces:
-        del X, y
-        raise self._pendiente()
+        if y is None:
+            raise ValueError("Fisherfaces necesita y_train: LDA usa las identidades.")
+        X = np.asarray(X)
+        y = np.asarray(y)
+        if X.ndim != 2 or y.ndim != 1 or X.shape[0] != y.shape[0]:
+            raise ValueError("Se esperan X de forma (N, p) e y de forma (N,).")
+        if not np.isfinite(X).all():
+            raise ValueError("Fisherfaces: X contiene valores no finitos.")
+
+        n_muestras, n_pixeles = X.shape
+        n_clases = np.unique(y).size
+        if n_clases < 2 or n_muestras <= n_clases:
+            raise ValueError("Fisherfaces requiere al menos dos clases y N > C.")
+        maximo_pca = min(n_muestras - 1, n_pixeles)
+        if self.d_pca > maximo_pca:
+            raise ValueError(
+                f"d_pca={self.d_pca} supera min(N-1, p)={maximo_pca}."
+            )
+        if self.d_lda > min(n_clases - 1, self.d_pca):
+            raise ValueError(
+                f"d_lda={self.d_lda} supera min(C-1, d_pca)="
+                f"{min(n_clases - 1, self.d_pca)}."
+            )
+
+        # Ambos ajustes reciben exclusivamente TRAIN. PCA estima su media.
+        pca = ExtractorPCA(n_components=self.d_pca)
+        Z_pca = pca.fit_transform(X)
+        singulares = pca._modelo.singular_values_
+        tolerancia = (
+            max(X.shape) * np.finfo(singulares.dtype).eps * singulares[0]
+        )
+        if np.count_nonzero(singulares > tolerancia) < self.d_pca:
+            raise ValueError("d_pca supera el rango numérico de X centrada.")
+
+        lda = ExtractorLDA(n_components=self.d_lda)
+        # comprobar también detecta si el rango de LDA no alcanza d_lda.
+        self.comprobar(lda.fit_transform(Z_pca, y), n_muestras)
+        self._pca, self._lda = pca, lda
+        return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:
-        del X
-        raise self._pendiente()
-
-    def _pendiente(self) -> EtapaPendienteAlumno:
-        return EtapaPendienteAlumno(
-            "embeddings.fisherfaces.ExtractorFisherfaces",
-            "Ajuste PCA(d_pca) solo con X_train. Ajuste LDA(d_lda) sobre el PCA "
-            "de TRAIN usando y_train. Pase TEST por las dos transformaciones, "
-            f"sin reajustar. Aquí d_pca={self.d_pca} y d_lda={self.d_lda}; "
-            "compruebe d_lda <= min(C-1, d_pca).",
-        )
+        # TRAIN y TEST usan las mismas proyecciones; aquí nunca se llama a fit.
+        Z_pca = self._pca.transform(X)
+        return self.comprobar(self._lda.transform(Z_pca), X.shape[0])
