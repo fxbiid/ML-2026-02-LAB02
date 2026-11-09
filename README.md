@@ -1,6 +1,6 @@
 # Laboratorio: embeddings faciales lineales
 
-Pipeline académico para comparar **PCA** y **LDA** en el reconocimiento de rostros, y dejar listo el lugar donde el alumno completa **Fisherfaces** y el experimento con **LFW**.
+Pipeline académico para comparar **PCA**, **LDA** y **Fisherfaces** en el reconocimiento de rostros con **Olivetti** y **LFW**.
 
 La pregunta de trabajo es si una fotografía nueva corresponde a una identidad ya conocida. El píxel no se compara directo: primero se obtiene un embedding lineal y después un clasificador elige la identidad.
 
@@ -15,7 +15,7 @@ No use `pip install` ni `requirements.txt`. El entorno oficial es `environment.y
 
 ```bash
 conda env create -f environment.yml
-conda activate lab-embeddings-faciales
+conda activate lab02-ml-2026-2
 ```
 
 Para recrearlo:
@@ -35,17 +35,17 @@ cp .env.example .env
 Desde la raíz del repositorio, con el entorno activado:
 
 ```bash
-python main.py olivetti       # PCA y LDA; guarda tabla, figuras y modelos
-python main.py lfw            # TODO(alumno): mismo protocolo cuando complete el cargador
-python main.py experimentos   # Olivetti e intento de LFW
+python main.py olivetti       # PCA, LDA y Fisherfaces en Olivetti
+python main.py lfw            # El mismo protocolo en LFW
+python main.py experimentos   # Olivetti y LFW
 streamlit run app.py          # rostros de prueba con PCA o LDA
 ```
 
-La primera ejecución descarga Olivetti en `data/cache/`. TRAIN aprende la media, las direcciones y el clasificador. TEST solo pasa por `transform` y `predict`.
+La primera ejecución de cada conjunto descarga sus datos en `data/cache/`. TRAIN aprende la media, las direcciones y el clasificador. TEST solo pasa por `transform` y `predict`.
 
 Salida esperada al cargar Olivetti: `X (400, 4096)`, train `(300, 4096)`, test `(100, 4096)`.
 
-## Qué está implementado y qué debe completar
+## Módulos del laboratorio
 
 | Módulo | Estado | Qué hace |
 | --- | --- | --- |
@@ -57,9 +57,9 @@ Salida esperada al cargar Olivetti: `X (400, 4096)`, train `(300, 4096)`, test `
 | `src/evaluacion/` | Listo | Accuracy, macro-F1, confusión, curva PCA, t-SNE y UMAP |
 | `src/interfaz/` y `app.py` | Listo | Foto de prueba, acierto y probabilidad |
 | `src/embeddings/fisherfaces.py` | Listo | PCA y después LDA, ambos ajustados en TRAIN |
-| `src/datos/lfw.py` | `TODO(alumno)` | Hasta 50 identidades con al menos 20 fotos |
+| `src/datos/lfw.py` | Listo | Hasta 50 identidades con al menos 20 fotos |
 
-Si ejecuta una etapa pendiente, el programa imprime una pista y **no falla en silencio**. Cuando Fisherfaces deje de lanzar `EtapaPendienteAlumno`, el mismo bucle lo evalúa con SVM, k-NN y árbol. Cuando `CargadorLFW.cargar` devuelva un `ConjuntoRostros`, `python main.py lfw` reutiliza ese protocolo.
+LFW conserva las identidades con más fotos, hasta el máximo indicado, y reindexa sus etiquetas manteniendo sus nombres. Ambos experimentos evalúan PCA, LDA y Fisherfaces con SVM, k-NN y árbol.
 
 ## Protocolo
 
@@ -94,9 +94,9 @@ pdflatex lab-embeddings-faciales.tex
 
 `PipelineExperimentos` coordina:
 
-1. `CargadorOlivetti` (o `CargadorLFW`, cuando el alumno lo complete).
+1. `CargadorOlivetti` o `CargadorLFW`.
 2. `DivisorEstratificado`, que deja cada identidad de test también en train.
-3. `FabricaExtractores`: PCA, LDA y el gancho de Fisherfaces.
+3. `FabricaExtractores` construye PCA, LDA y Fisherfaces.
 4. `FabricaClasificadores` y `Evaluador` sobre el embedding, nunca sobre los píxeles de test para ajustar.
 5. `Visualizador` para la curva de varianza, las eigenfaces, las confusiones y los mapas.
 6. `ServicioReconocimiento`, que lee el mismo artefacto que guardó el orquestador.
@@ -115,8 +115,8 @@ main.py                 Experimentos, tabla y figuras
 app.py                  Interfaz Streamlit
 environment.yml         Entorno conda
 src/pipeline.py         PipelineExperimentos
-src/datos/              Olivetti listo; LFW pendiente
-src/embeddings/         PCA y LDA listos; Fisherfaces pendiente
+src/datos/              Cargadores de Olivetti y LFW
+src/embeddings/         PCA, LDA y Fisherfaces
 src/clasificadores/     SVM, k-NN y árbol
 src/evaluacion/         Métricas y figuras
 src/interfaz/           Predicción sobre el conjunto de prueba
