@@ -41,19 +41,15 @@ class ServicioReconocimiento:
 
     def predecir(self, indice: int, embedding: str, clasificador: str, d: int) -> Prediccion:
         self._exigir_indice(indice)
-        if embedding == "fisherfaces":
-            raise ValueError(
-                "Fisherfaces es TODO(alumno) en src/embeddings/fisherfaces.py "
-                "y no está disponible en la interfaz."
-            )
         bundle = self._obtener_bundle(embedding, clasificador, d)
         x = self.particion.X_test[indice : indice + 1]
         Z = bundle["extractor"].transform(x)
         modelo = bundle["clasificador"]
         probabilidad = np.asarray(modelo.predict_proba(Z)[0], dtype=float)
         clases = np.asarray(modelo.classes_)
-        ganador = int(np.argmax(probabilidad))
-        predicha = int(clases[ganador])
+        # La evaluación usa predict; para SVM puede diferir de argmax(predict_proba).
+        predicha = int(modelo.predict(Z)[0])
+        indice_predicha = np.flatnonzero(clases == predicha)[0]
         real = int(self.particion.y_test[indice])
         orden = np.argsort(probabilidad)[::-1][:5]
         top = [
@@ -66,7 +62,7 @@ class ServicioReconocimiento:
             identidad_predicha=predicha,
             nombre_real=self._nombre(real),
             nombre_predicho=self._nombre(predicha),
-            probabilidad=float(probabilidad[ganador]),
+            probabilidad=float(probabilidad[indice_predicha]),
             acierto=predicha == real,
             top=top,
             nota_probabilidad=self.fabrica_clasificadores.nota_probabilidad(clasificador),

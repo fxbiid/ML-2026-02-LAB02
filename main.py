@@ -3,9 +3,9 @@
 
 Uso (con el entorno conda activado):
 
-    python main.py olivetti       # PCA y LDA sobre Olivetti; Fisherfaces avisa
-    python main.py lfw            # TODO(alumno): mismo protocolo cuando exista el cargador
-    python main.py experimentos   # Olivetti e intento de LFW
+    python main.py olivetti       # Experimento con Olivetti
+    python main.py lfw            # Experimento con LFW
+    python main.py experimentos   # Ambos conjuntos
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ def construir_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "etapa",
         choices=["olivetti", "lfw", "experimentos"],
-        help="Conjunto a evaluar. 'experimentos' corre Olivetti e intenta LFW.",
+        help="Conjunto a evaluar. 'experimentos' evalúa Olivetti y LFW.",
     )
     return parser
 

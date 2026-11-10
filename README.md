@@ -38,7 +38,7 @@ Desde la raíz del repositorio, con el entorno activado:
 python main.py olivetti       # PCA, LDA y Fisherfaces en Olivetti
 python main.py lfw            # El mismo protocolo en LFW
 python main.py experimentos   # Olivetti y LFW
-streamlit run app.py          # rostros de prueba con PCA o LDA
+streamlit run app.py          # rostros de prueba con PCA, LDA o Fisherfaces
 ```
 
 La primera ejecución de cada conjunto descarga sus datos en `data/cache/`. TRAIN aprende la media, las direcciones y el clasificador. TEST solo pasa por `transform` y `predict`.
@@ -76,7 +76,7 @@ LFW conserva las identidades con más fotos, hasta el máximo indicado, y reinde
 
 ## Interfaz
 
-`streamlit run app.py` muestra una fotografía del conjunto de prueba de Olivetti. En la barra se elige PCA o LDA, el clasificador y `d`. La pantalla indica si la identidad predicha coincide con la real y con qué probabilidad.
+`streamlit run app.py` muestra una fotografía del conjunto de prueba de Olivetti. En la barra se elige PCA, LDA o Fisherfaces, el clasificador y `d`. La pantalla usa la misma predicción que el experimento y muestra la probabilidad estimada para esa identidad.
 
 No cargue fotografías personales. Los rostros son datos biométricos.
 

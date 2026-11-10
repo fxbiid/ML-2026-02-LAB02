@@ -1,8 +1,4 @@
-"""Orquestación OOP del laboratorio.
-
-Etapas implementadas: Olivetti con PCA y LDA, tres clasificadores y figuras.
-Etapas pendientes del alumno: Fisherfaces y el experimento LFW.
-"""
+"""Experimentos de Olivetti y LFW con PCA, LDA y Fisherfaces."""
 
 from __future__ import annotations
 
@@ -91,7 +87,7 @@ class PipelineExperimentos:
                     fisher_omitido = True
                 continue
 
-            if extractor.dimension == DIMENSION_MAPAS and extractor.nombre in {"pca", "lda"}:
+            if extractor.dimension == DIMENSION_MAPAS:
                 proyecciones_mapa[(extractor.nombre, extractor.dimension)] = (
                     Z_train,
                     particion.y_train,

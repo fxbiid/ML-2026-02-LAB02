@@ -25,7 +25,7 @@ class FabricaExtractores:
         raise ValueError(f"Embedding desconocido: {nombre}")
 
     def para_experimento(self, n_clases: int) -> list[ExtractorEmbedding]:
-        """PCA y LDA en d = 10, 20, 30, más Fisherfaces para que el alumno lo active."""
+        """PCA, LDA y Fisherfaces en las dimensiones del protocolo."""
         extractores: list[ExtractorEmbedding] = []
         lda_vistos: set[int] = set()
         for d in DIMENSIONES:
