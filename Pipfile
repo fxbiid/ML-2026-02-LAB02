@@ -1,0 +1,16 @@
+# Dependencias del prototipo para Streamlit Community Cloud.
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+joblib = "*"
+numpy = "*"
+pandas = "*"
+python-dotenv = "*"
+scikit-learn = "==1.9.1"
+streamlit = "==1.66.1"
+
+[requires]
+python_version = "3.11"
