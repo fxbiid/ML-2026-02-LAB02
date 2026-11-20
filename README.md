@@ -11,17 +11,17 @@ La pregunta de trabajo es si una fotografía nueva corresponde a una identidad y
 
 ## Entorno conda
 
-No use `pip install` ni `requirements.txt`. El entorno oficial es `environment.yml`.
+No use `pip install` ni `requirements.txt`. El entorno oficial es `conda/environment.yml`.
 
 ```bash
-conda env create -f environment.yml
+conda env create -f conda/environment.yml
 conda activate lab02-ml-2026-2
 ```
 
 Para recrearlo:
 
 ```bash
-conda env update -f environment.yml --prune
+conda env update -f conda/environment.yml --prune
 ```
 
 Los valores por defecto (semilla 42, 25 % de prueba, caché en `data/cache`) alcanzan para ejecutar el laboratorio. Si quiere cambiarlos:
@@ -113,7 +113,7 @@ pdflatex lab-embeddings-faciales.tex
 ```
 main.py                 Experimentos, tabla y figuras
 app.py                  Interfaz Streamlit
-environment.yml         Entorno conda
+conda/environment.yml   Entorno conda
 src/pipeline.py         PipelineExperimentos
 src/datos/              Cargadores de Olivetti y LFW
 src/embeddings/         PCA, LDA y Fisherfaces
